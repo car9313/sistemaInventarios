@@ -89,6 +89,7 @@ export const userRepo = (opts?: { supabaseClient?: typeof supabase }) => {
       return { error: { message: extractMessage(err) } as AuthError }
     }
   }
+
   return {
     listUser,
     createUser,
