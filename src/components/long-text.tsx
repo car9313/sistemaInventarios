@@ -16,12 +16,16 @@ type LongTextProps = {
   children: React.ReactNode
   className?: string
   contentClassName?: string
+  tooltip?: React.ReactNode
+  forceTooltip?: boolean
 }
 
 export function LongText({
   children,
   className = '',
   contentClassName = '',
+  tooltip,
+  forceTooltip = false,
 }: LongTextProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [isOverflown, setIsOverflown] = useState(false)
@@ -34,7 +38,10 @@ export function LongText({
     }
   }
 
-  if (!isOverflown)
+  // show tooltip when overflowing OR when forceTooltip is true
+  const shouldShowTooltip = isOverflown || forceTooltip
+
+  if (!shouldShowTooltip)
     return (
       <div ref={refCallback} className={cn('truncate', className)}>
         {children}
@@ -52,7 +59,7 @@ export function LongText({
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p className={contentClassName}>{children}</p>
+              <p className={contentClassName}>{tooltip ?? children}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -65,7 +72,7 @@ export function LongText({
             </div>
           </PopoverTrigger>
           <PopoverContent className={cn('w-fit', contentClassName)}>
-            <p>{children}</p>
+            <p>{tooltip ?? children}</p>
           </PopoverContent>
         </Popover>
       </div>

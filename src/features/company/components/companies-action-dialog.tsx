@@ -1,13 +1,5 @@
-import { z } from 'zod'
 import { useForm } from 'react-hook-form'
-import {
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@radix-ui/react-select'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Select } from 'react-day-picker'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -26,41 +18,36 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/password-input'
 import {
-  type CreateUsuarioInput,
-  createUsuarioSchema,
-  type Usuario as User,
+  type CompanyCreateForm,
+  type Company,
+  companyFormCreateSchema,
 } from '../data/schema'
-import { useCreateUsuario } from '../hooks/use-usuarios'
+import { useCreateCompany } from '../hooks/use-companies'
 
-type UserActionDialogProps = {
-  currentRow?: User
+type CompanyActionDialogProps = {
+  currentRow?: Company
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function UsersActionDialog({
+export function CompaniesActionDialog({
   currentRow,
   open,
   onOpenChange,
-}: UserActionDialogProps) {
-  const isEdit = !!currentRow
+}: CompanyActionDialogProps) {
+  const isUpdate = !!currentRow
 
-  const { mutate: createUsuario } = useCreateUsuario()
-  const form = useForm<CreateUsuarioInput>({
-    resolver: zodResolver(createUsuarioSchema),
-    defaultValues: {
-      email: '',
-      full_name: '',
-      role: 'vendedor',
-    },
+  const { mutate: createCompany } = useCreateCompany()
+  const form = useForm<CompanyCreateForm>({
+    resolver: zodResolver(companyFormCreateSchema),
+    defaultValues: currentRow,
   })
 
-  const onSubmit = (data: CreateUsuarioInput) => {
-    createUsuario(data, {
+  const onSubmit = (data: CompanyCreateForm) => {
+    console.log(data)
+    createCompany(data, {
       onSuccess: () => {
-        onSuccess()
         form.reset()
       },
     })
@@ -76,13 +63,15 @@ export function UsersActionDialog({
     >
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader className='text-start'>
-          <DialogTitle>{isEdit ? 'Edit User' : 'Add New User'}</DialogTitle>
+          <DialogTitle>{isUpdate ? 'Update' : 'Create'} Comapany</DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Update the user here. ' : 'Create new user here. '}
+            {isUpdate
+              ? 'Update the company here. '
+              : 'Create new company here. '}
             Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
-        <div className='h-[26.25rem] w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3'>
+        <div className='h-[20.25rem] w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3'>
           <Form {...form}>
             <form
               id='user-form'
@@ -91,30 +80,13 @@ export function UsersActionDialog({
             >
               <FormField
                 control={form.control}
-                name='email'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-end'>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='john.doe@gmail.com'
-                        className='col-span-4'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='full_name'
+                name='name'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-end'>Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Claudia Alfonso Rodriguez'
+                        placeholder='Mi empresa'
                         className='col-span-4'
                         {...field}
                       />
@@ -134,7 +106,4 @@ export function UsersActionDialog({
       </DialogContent>
     </Dialog>
   )
-}
-function onSuccess() {
-  throw new Error('Function not implemented.')
 }

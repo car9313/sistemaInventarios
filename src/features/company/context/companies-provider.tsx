@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from 'react'
 import useDialogState from '../../../hooks/use-dialog-state'
 import { type Company } from '../data/schema'
 
-type CompaniesDialogType = 'create' | 'update' | 'delete' | 'import'
+type CompaniesDialogType = 'create' | 'update' | 'delete' | 'import' | 'view'
 
 type CompaniesContextType = {
   open: CompaniesDialogType | null

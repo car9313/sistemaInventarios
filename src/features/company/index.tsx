@@ -4,6 +4,7 @@ import { Main } from '../../components/layout/main'
 import { ProfileDropdown } from '../../components/profile-dropdown'
 import { Search } from '../../components/search'
 import { ThemeSwitch } from '../../components/theme-switch'
+import { CompaniesDialogs } from './components/companies-dialogs'
 import { CompaniesPrimaryButtons } from './components/companies-primary-buttons'
 import { CompaniesTable } from './components/companies-table'
 import { CompaniesProvider } from './context/companies-provider'
@@ -33,6 +34,7 @@ export default function Companies() {
         </div>
         <CompaniesTable data={companies} />
       </Main>
+      <CompaniesDialogs />
     </CompaniesProvider>
   )
 }

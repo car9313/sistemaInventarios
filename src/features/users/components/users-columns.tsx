@@ -1,14 +1,12 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
-import { LongText } from '@/components/long-text'
-import { callTypes, roles } from '../data/data'
-import { type User } from '../data/schema'
+import { roles } from '../data/data'
+import { type Usuario } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 
-export const usersColumns: ColumnDef<User>[] = [
+export const usersColumns: ColumnDef<Usuario>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -36,13 +34,13 @@ export const usersColumns: ColumnDef<User>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: 'username',
+  /* {
+    accessorKey: 'auth_id',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Username' />
+      <DataTableColumnHeader column={column} title='Auth id' />
     ),
     cell: ({ row }) => (
-      <LongText className='max-w-36 ps-3'>{row.getValue('username')}</LongText>
+      <LongText className='max-w-36 ps-3'>{row.getValue('auth_id')}</LongText>
     ),
     meta: {
       className: cn(
@@ -51,19 +49,19 @@ export const usersColumns: ColumnDef<User>[] = [
       ),
     },
     enableHiding: false,
-  },
-  {
-    id: 'fullName',
+  }, */
+  /* {
+    id: 'full_name',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Name' />
     ),
     cell: ({ row }) => {
-      const { firstName, lastName } = row.original
-      const fullName = `${firstName} ${lastName}`
-      return <LongText className='max-w-36'>{fullName}</LongText>
+      ;<LongText className='max-w-36 ps-3'>
+        {row.getValue('full_name')}
+      </LongText>
     },
     meta: { className: 'w-36' },
-  },
+  }, */
   {
     accessorKey: 'email',
     header: ({ column }) => (
@@ -73,26 +71,26 @@ export const usersColumns: ColumnDef<User>[] = [
       <div className='w-fit ps-2 text-nowrap'>{row.getValue('email')}</div>
     ),
   },
-  {
+  /* {
     accessorKey: 'phoneNumber',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Phone Number' />
     ),
     cell: ({ row }) => <div>{row.getValue('phoneNumber')}</div>,
     enableSorting: false,
-  },
-  {
-    accessorKey: 'status',
+  }, */
+  /*  {
+    accessorKey: 'role',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Status' />
+      <DataTableColumnHeader column={column} title='Roles' />
     ),
     cell: ({ row }) => {
-      const { status } = row.original
-      const badgeColor = callTypes.get(status)
+      const { role } = row.original
+      const badgeColor = callTypes.get(role)
       return (
         <div className='flex space-x-2'>
           <Badge variant='outline' className={cn('capitalize', badgeColor)}>
-            {row.getValue('status')}
+            {row.getValue('role')}
           </Badge>
         </div>
       )
@@ -102,7 +100,7 @@ export const usersColumns: ColumnDef<User>[] = [
     },
     enableHiding: false,
     enableSorting: false,
-  },
+  }, */
   {
     accessorKey: 'role',
     header: ({ column }) => (

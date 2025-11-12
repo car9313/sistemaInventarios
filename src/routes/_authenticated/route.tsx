@@ -12,20 +12,20 @@ export const Route = createFileRoute('/_authenticated')({
       await new Promise((resolve) => setTimeout(resolve, 100))
       // Recargar el estado después de esperar
       const { user: currentUser } = useMyAuthStore.getState()
-      /* if (!currentUser) {
+      if (!currentUser) {
         throw redirect({
           to: '/sign-in',
         })
-      } */
+      }
       return
     }
 
     // Si no hay usuario, redirigir al login
-    /* if (!user) {
+    if (!user) {
       throw redirect({
         to: '/sign-in',
       })
-    } */
+    }
   },
   component: AuthenticatedLayout,
 })

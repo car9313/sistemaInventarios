@@ -17,20 +17,11 @@ import { z } from 'zod'
     path: ['confirmPassword'],
   }) */
 
-export const createUsuarioSchema = z
-  .object({
-    email: z.string().email('Email inválido'),
-    password: z
-      .string()
-      .min(6, 'La contraseña debe tener al menos 6 caracteres'),
-    confirmPassword: z.string(),
-    full_name: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
-    role: z.enum(['vendedor', 'almacenista', 'auditor']), // ❌ SIN 'admin' y 'gerente'
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Las contraseñas no coinciden',
-    path: ['confirmPassword'],
-  })
+export const createUsuarioSchema = z.object({
+  email: z.string().email('Email inválido'),
+  full_name: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
+  role: z.enum(['vendedor', 'almacenista', 'auditor']), // ❌ SIN 'admin' y 'gerente'
+})
 
 // Schema para ACTUALIZAR usuario (sin password)
 export const updateUsuarioSchema = z.object({

@@ -4,6 +4,7 @@ import {
   type CompanyCreateForm,
   companySchema,
   type Company,
+  companyFormCreateSchema,
 } from '../data/schema'
 import { companyRepo } from './../repo/company-repo'
 
@@ -27,7 +28,8 @@ export const useCreateCompany = () => {
   return useMutation({
     mutationFn: async (companyForm: CompanyCreateForm) => {
       // Validar con Zod
-      const validatedData = companySchema.parse(companyForm)
+      console.log(companyForm)
+      const validatedData = companyFormCreateSchema.parse(companyForm)
       const {
         data: { session },
       } = await supabase.auth.getSession()
