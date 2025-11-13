@@ -15,7 +15,9 @@ type AuthenticatedLayoutProps = {
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   const defaultOpen = getCookie('sidebar_state') !== 'false'
   return (
-    <ProtectedRoute>
+    <>
+      {' '}
+      {/* <ProtectedRoute> */}
       <SearchProvider>
         <LayoutProvider>
           <SidebarProvider defaultOpen={defaultOpen}>
@@ -40,6 +42,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
           </SidebarProvider>
         </LayoutProvider>
       </SearchProvider>
-    </ProtectedRoute>
+      {/* </ProtectedRoute> */}
+    </>
   )
 }

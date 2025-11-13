@@ -16,11 +16,40 @@ import { z } from 'zod'
     message: 'Las contraseñas no coinciden',
     path: ['confirmPassword'],
   }) */
+const usuarioRoleSchema = z.union([
+  z.literal('admin'),
+  z.literal('gerente'),
+  z.literal('almacenista'),
+  z.literal('vendedor'),
+  z.literal('auditor'),
+])
+
+const usuarioCreateRoleSchema = z.union([
+  z.literal('gerente'),
+  z.literal('almacenista'),
+  z.literal('vendedor'),
+  z.literal('auditor'),
+])
+
+export type UserRole = z.infer<typeof usuarioRoleSchema>
+
+export const usuarioSchema = z.object({
+  id: z.number(),
+  auth_id: z.uuid(),
+  email: z.email(),
+  full_name: z.string(),
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  role: usuarioRoleSchema.default('admin'),
+  created_by: z.number().nullable(),
+  created_at: z.iso.datetime(),
+})
+export type Usuario = z.infer<typeof usuarioSchema>
 
 export const createUsuarioSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: z.email('Email inválido'),
   full_name: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
-  role: z.enum(['vendedor', 'almacenista', 'auditor']), // ❌ SIN 'admin' y 'gerente'
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  role: usuarioCreateRoleSchema.default('vendedor'), // ❌ SIN 'admin' y 'gerente'
 })
 
 // Schema para ACTUALIZAR usuario (sin password)
@@ -29,28 +58,9 @@ export const updateUsuarioSchema = z.object({
   role: z.enum(['admin', 'gerente', 'vendedor', 'almacenista', 'auditor']),
 })
 
-// Schema para el USUARIO en la base de datos
-/* export const usuarioSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
-  full_name: z.string(),
-  role: z.enum(['admin', 'gerente', 'vendedor', 'almacenista', 'auditor']),
-  created_at: z.string().datetime(),
-}) */
-export const usuarioSchema = z.object({
-  id: z.number(),
-  auth_id: z.string().uuid(),
-  email: z.string().email(),
-  full_name: z.string(),
-  role: z.enum(['admin', 'gerente', 'vendedor', 'almacenista', 'auditor']),
-  created_by: z.number().nullable(),
-  created_at: z.string().datetime(),
-})
-
 // Inferir tipos TypeScript desde los schemas Zod
 export type CreateUsuarioInput = z.infer<typeof createUsuarioSchema>
 export type UpdateUsuarioInput = z.infer<typeof updateUsuarioSchema>
-export type Usuario = z.infer<typeof usuarioSchema>
 
 /* import { z } from 'zod'
 

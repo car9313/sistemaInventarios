@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: z.email('Email inválido'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
 })
 
@@ -18,10 +18,9 @@ export const registerSchema = z
     message: 'Las contraseñas no coinciden',
     path: ['confirmPassword'],
   })
-  
 
 export const resetPasswordSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: z.email('Email inválido'),
 })
 
 export type LoginInput = z.infer<typeof loginSchema>

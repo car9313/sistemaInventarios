@@ -11,7 +11,7 @@ import { CompaniesProvider } from './context/companies-provider'
 import { useCompanies } from './hooks/use-companies'
 
 export default function Companies() {
-  const { data: companies = [], isLoading } = useCompanies()
+  const { data: companies = [] } = useCompanies()
   return (
     <CompaniesProvider>
       <Header fixed>

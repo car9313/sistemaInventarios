@@ -3,10 +3,10 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { LongText } from '../../../components/long-text'
+import OwnerTooltip from '../../../components/owner-tooltip'
 import { cn } from '../../../lib/utils'
 import { type Company } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
-import OwnerTooltip from './owner-tooltip'
 
 export const companiesColumns: ColumnDef<Company>[] = [
   {

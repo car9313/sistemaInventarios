@@ -1,5 +1,5 @@
 import { supabase } from '../../../lib/supabase'
-import { type CompanyForm } from '../schemas/company-schema'
+import { type CompanyCreateForm } from '../data/schema'
 
 export const companyRepo = () => {
   const listCompanies = async () => {
@@ -8,7 +8,10 @@ export const companyRepo = () => {
       .select('*')
       .order('created_at', { ascending: false })
   }
-  const createCompany = async (validatedData: CompanyForm, id: string) => {
+  const createCompany = async (
+    validatedData: CompanyCreateForm,
+    id: string
+  ) => {
     return await supabase
       .from('companies')
       .insert([{ ...validatedData, owner_id: id }])
@@ -16,7 +19,7 @@ export const companyRepo = () => {
 
   const updateCompany = async (
     id: string,
-    validatedData: Pick<CompanyForm, 'name'>
+    validatedData: Pick<CompanyCreateForm, 'name'>
   ) => {
     return await supabase.from('companies').update(validatedData).eq('id', id)
   }
