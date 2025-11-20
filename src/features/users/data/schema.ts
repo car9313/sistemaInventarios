@@ -16,15 +16,8 @@ import { z } from 'zod'
     message: 'Las contraseñas no coinciden',
     path: ['confirmPassword'],
   }) */
-const usuarioRoleSchema = z.union([
-  z.literal('admin'),
-  z.literal('gerente'),
-  z.literal('almacenista'),
-  z.literal('vendedor'),
-  z.literal('auditor'),
-])
 
-const usuarioCreateRoleSchema = z.union([
+/* const usuarioCreateRoleSchema = z.union([
   z.literal('gerente'),
   z.literal('almacenista'),
   z.literal('vendedor'),
@@ -32,30 +25,29 @@ const usuarioCreateRoleSchema = z.union([
 ])
 
 export type UserRole = z.infer<typeof usuarioRoleSchema>
-
+ */
 export const usuarioSchema = z.object({
   id: z.number(),
   auth_id: z.uuid(),
   email: z.email(),
   full_name: z.string(),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
-  role: usuarioRoleSchema.default('admin'),
-  created_by: z.number().nullable(),
-  created_at: z.iso.datetime(),
+  role: z.enum(['gerente', 'vendedor', 'almacenista', 'auditor']),
+  created_by: z.uuid().nullable(), // Cambiar de number() a uuid()
 })
+
 export type Usuario = z.infer<typeof usuarioSchema>
 
 export const createUsuarioSchema = z.object({
   email: z.email('Email inválido'),
   full_name: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
-  role: usuarioCreateRoleSchema.default('vendedor'), // ❌ SIN 'admin' y 'gerente'
+  role: z.enum(['gerente', 'vendedor', 'almacenista', 'auditor']), // ❌ SIN 'admin' y 'gerente'
 })
 
 // Schema para ACTUALIZAR usuario (sin password)
 export const updateUsuarioSchema = z.object({
   full_name: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
-  role: z.enum(['admin', 'gerente', 'vendedor', 'almacenista', 'auditor']),
+  role: z.enum(['gerente', 'vendedor', 'almacenista', 'auditor']),
 })
 
 // Inferir tipos TypeScript desde los schemas Zod

@@ -1,31 +1,31 @@
 import { UsersActionDialog } from './users-action-dialog'
 import { UsersDeleteDialog } from './users-delete-dialog'
-import { UsersInviteDialog } from './users-invite-dialog'
+import { UsersImportDialog } from './users-import-dialog'
 import { useUsers } from './users-provider'
 
 export function UsersDialogs() {
   const { open, setOpen, currentRow, setCurrentRow } = useUsers()
+  console.log(currentRow)
   return (
     <>
       <UsersActionDialog
-        key='user-add'
-        open={open === 'add'}
-        onOpenChange={() => setOpen('add')}
+        key='user-create'
+        open={open === 'create'}
+        onOpenChange={() => setOpen('create')}
       />
-
-      <UsersInviteDialog
-        key='user-invite'
-        open={open === 'invite'}
-        onOpenChange={() => setOpen('invite')}
+      <UsersImportDialog
+        key='user-import'
+        open={open === 'import'}
+        onOpenChange={() => setOpen('import')}
       />
 
       {currentRow && (
         <>
           <UsersActionDialog
-            key={`user-edit-${currentRow.id}`}
-            open={open === 'edit'}
+            key={`user-update-${currentRow.id}`}
+            open={open === 'update'}
             onOpenChange={() => {
-              setOpen('edit')
+              setOpen('update')
               setTimeout(() => {
                 setCurrentRow(null)
               }, 500)

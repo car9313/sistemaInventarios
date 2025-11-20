@@ -5,6 +5,7 @@ import {
   companySchema,
   type Company,
   companyFormCreateSchema,
+  companyFormUpdateSchema,
 } from '../data/schema'
 import { companyRepo } from './../repo/company-repo'
 
@@ -56,7 +57,7 @@ export const useUpdateCompany = () => {
       id: string
       data: Pick<CompanyCreateForm, 'name'>
     }) => {
-      const validatedData = companySchema.parse(data)
+      const validatedData = companyFormUpdateSchema.parse(data)
       const { error } = await repo.updateCompany(id, validatedData)
       if (error) throw error
     },

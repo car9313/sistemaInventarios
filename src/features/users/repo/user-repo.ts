@@ -1,3 +1,4 @@
+import { temporarilyIgnoreAuthEvents } from '../../../context/auth-provider'
 import { supabase } from '../../../lib/supabase'
 import { mapDbUsuarioToAuthUser } from '../../auth/adapters/mapperAuthAdapter'
 import {
@@ -12,17 +13,20 @@ export const userRepo = (opts?: { supabaseClient?: typeof supabase }) => {
   const client = opts?.supabaseClient ?? supabase
 
   const listUser = async () => {
-    return await supabase
-      .from('usuarios')
-      .select('*')
-      .order('created_at', { ascending: false })
+    return await supabase.from('usuarios').select('*')
   }
 
   const createUser = async (
     usuarioData: CreateUsuarioInput,
-    idCurrentUser: number
+    idCurrentUser: string
   ) => {
+    console.log('ID del usuario actual:', idCurrentUser)
+
+    // ⭐️ 1. Activar flag para ignorar eventos de auth
+    temporarilyIgnoreAuthEvents(3000) // Ignorar por 3 segundos
+
     try {
+      // 2. Crear el nuevo usuario
       const res = await client.auth.signUp({
         email: usuarioData.email,
         password: usuarioData.password,
@@ -41,7 +45,6 @@ export const userRepo = (opts?: { supabaseClient?: typeof supabase }) => {
       }
 
       const supUser = res.data?.user ?? null
-      const session = res.data?.session ?? undefined
 
       if (!supUser) {
         return {
@@ -50,6 +53,8 @@ export const userRepo = (opts?: { supabaseClient?: typeof supabase }) => {
           } as AuthError,
         }
       }
+
+      // 3. Insertar en tu tabla usuarios
       const insertPayload: Omit<Profile, 'id'> = {
         auth_id: supUser.id,
         full_name: usuarioData.full_name,
@@ -84,12 +89,11 @@ export const userRepo = (opts?: { supabaseClient?: typeof supabase }) => {
         return { error: { message: extractMessage(mErr) } as AuthError }
       }
 
-      return { user, session }
+      return { user }
     } catch (err: unknown) {
       return { error: { message: extractMessage(err) } as AuthError }
     }
   }
-
   return {
     listUser,
     createUser,

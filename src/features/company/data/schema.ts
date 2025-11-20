@@ -21,5 +21,10 @@ export const companyFormCreateSchema = z.object({
 
 export type CompanyCreateForm = z.infer<typeof companyFormCreateSchema>
 
-// Para updates (opcional, si permites editar nombre)
-export const companyUpdateFormSchema = companyFormCreateSchema
+// Nuevo: esquema para actualización (sólo campos editables)
+export const companyFormUpdateSchema = z.object({
+  name: z.string().min(1, 'El nombre es requerido'),
+  // incluye solo los campos que el usuario puede cambiar
+})
+
+export type CompanyUpdateForm = z.infer<typeof companyFormUpdateSchema>

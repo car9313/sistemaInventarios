@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react'
-import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { IconFacebook, IconGithub } from '@/assets/brand-icons'
 import { useMyAuthStore } from '@/stores/my-auth-store'
 import { cn } from '@/lib/utils'
-import { useRegister } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -23,6 +20,7 @@ import {
   type RegisterInput,
   registerSchema,
 } from '@/features/auth/schemas/auth-schema'
+import { useRegister } from '../../../hooks/use-auth'
 
 export function SignUpForm({
   className,

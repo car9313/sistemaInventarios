@@ -70,6 +70,18 @@ export const usersColumns: ColumnDef<Usuario>[] = [
     cell: ({ row }) => (
       <div className='w-fit ps-2 text-nowrap'>{row.getValue('email')}</div>
     ),
+    enableSorting: false,
+  },
+  {
+    accessorKey: 'full_name',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Name' />
+    ),
+    cell: ({ row }) => (
+      <div className='w-fit ps-2 text-nowrap'>{row.getValue('full_name')}</div>
+    ),
+    enableSorting: false,
+    enableHiding: false,
   },
   /* {
     accessorKey: 'phoneNumber',
@@ -126,8 +138,8 @@ export const usersColumns: ColumnDef<Usuario>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
-    enableSorting: false,
-    enableHiding: false,
+    enableSorting: false /* 
+    enableHiding: false, */,
   },
   {
     id: 'actions',

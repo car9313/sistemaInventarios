@@ -1,5 +1,6 @@
 import type { Session as SupabaseSession } from '@supabase/supabase-js'
 import { supabase } from '../../../lib/supabase'
+import { useMyAuthStore } from '../../../stores/my-auth-store'
 import { mapDbUsuarioToAuthUser } from '../adapters/mapperAuthAdapter'
 import { type LoginInput, type RegisterInput } from '../schemas/auth-schema'
 import type {
@@ -42,8 +43,10 @@ export const repoAuth = (opts?: {
 }): AuthRepository => {
   const client = opts?.supabaseClient ?? supabase
 
+  // En tu repoAuth.ts - DEJAR SOLO la lógica de Supabase
   const login = async (dto: LoginInput) => {
     try {
+      // 1. Hacer el login con Supabase
       const res = await client.auth.signInWithPassword({
         email: dto.email,
         password: dto.password,
@@ -72,6 +75,7 @@ export const repoAuth = (opts?: {
         }
       }
 
+      // 2. Obtener el perfil completo de tu tabla usuarios
       const { data: usuarioRow, error: usuarioError } = await client
         .from('usuarios')
         .select('*')
@@ -86,7 +90,6 @@ export const repoAuth = (opts?: {
       }
 
       if (!usuarioRow) {
-        // Opción B: estricto -> error si no existe fila en `usuarios`
         return {
           error: {
             message: 'Perfil de usuario no encontrado en la tabla `usuarios`',
@@ -94,6 +97,7 @@ export const repoAuth = (opts?: {
         }
       }
 
+      // 3. Mapear a tu dominio
       let user: AuthUser
       try {
         user = mapDbUsuarioToAuthUser(usuarioRow, supUser)
@@ -101,12 +105,14 @@ export const repoAuth = (opts?: {
         return { error: { message: extractMessage(mErr) } as DomainAuthError }
       }
 
+      // ⭐️ 4. NO actualizar el store aquí - solo devolver datos
       return { user, session }
     } catch (err: unknown) {
       return { error: { message: extractMessage(err) } as DomainAuthError }
     }
   }
 
+  // ELIMINAR la función manualLogin - no es necesaria
   const registerPublic = async (dto: RegisterInput) => {
     try {
       const res = await client.auth.signUp({

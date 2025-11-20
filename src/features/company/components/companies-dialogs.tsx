@@ -12,34 +12,30 @@ export function CompaniesDialogs() {
       <CompaniesActionDialog
         key='company-create'
         open={open === 'create'}
-        onOpenChange={() => setOpen('create')}
+        onOpenChange={(isOpen) => setOpen(isOpen ? 'create' : null)}
       />
       <CompaniesImportDialog
         key='company-import'
         open={open === 'import'}
-        onOpenChange={() => setOpen('import')}
+        onOpenChange={(isOpen) => setOpen(isOpen ? 'import' : null)}
       />
       {currentRow && (
         <>
           <CompaniesViewDialog
             key={`company-view-${currentRow.id}`}
             open={open === 'view'}
-            onOpenChange={() => {
-              setOpen('view')
-              setTimeout(() => {
-                setCurrentRow(null)
-              }, 500)
+            onOpenChange={(isOpen) => {
+              setOpen(isOpen ? 'view' : null)
+              if (!isOpen) setTimeout(() => setCurrentRow(null), 500)
             }}
             currentRow={currentRow}
           />
           <CompaniesActionDialog
             key={`user-edit-${currentRow.id}`}
             open={open === 'update'}
-            onOpenChange={() => {
-              setOpen('update')
-              setTimeout(() => {
-                setCurrentRow(null)
-              }, 500)
+            onOpenChange={(isOpen) => {
+              setOpen(isOpen ? 'update' : null)
+              if (!isOpen) setTimeout(() => setCurrentRow(null), 500)
             }}
             currentRow={currentRow}
           />
@@ -48,11 +44,9 @@ export function CompaniesDialogs() {
             key='comapany-delete'
             destructive
             open={open === 'delete'}
-            onOpenChange={() => {
-              setOpen('delete')
-              setTimeout(() => {
-                setCurrentRow(null)
-              }, 500)
+            onOpenChange={(isOpen) => {
+              setOpen(isOpen ? 'delete' : null)
+              if (!isOpen) setTimeout(() => setCurrentRow(null), 500)
             }}
             handleConfirm={() => {
               setOpen(null)

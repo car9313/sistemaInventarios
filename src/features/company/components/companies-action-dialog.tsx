@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -22,8 +24,10 @@ import {
   type CompanyCreateForm,
   type Company,
   companyFormCreateSchema,
+  companyFormUpdateSchema,
+  type CompanyUpdateForm,
 } from '../data/schema'
-import { useCreateCompany } from '../hooks/use-companies'
+import { useCreateCompany, useUpdateCompany } from '../hooks/use-companies'
 
 type CompanyActionDialogProps = {
   currentRow?: Company
@@ -38,19 +42,46 @@ export function CompaniesActionDialog({
 }: CompanyActionDialogProps) {
   const isUpdate = !!currentRow
 
-  const { mutate: createCompany } = useCreateCompany()
-  const form = useForm<CompanyCreateForm>({
-    resolver: zodResolver(companyFormCreateSchema),
-    defaultValues: currentRow,
+  const { mutateAsync: createCompanyAsync } = useCreateCompany()
+  const { mutateAsync: updateCompanyAsync } = useUpdateCompany()
+  // elegir esquema/resolver según si es create o update
+  const form = useForm({
+    resolver: zodResolver(
+      isUpdate ? companyFormUpdateSchema : companyFormCreateSchema
+    ),
+    defaultValues: isUpdate ? { name: currentRow?.name ?? '' } : undefined,
   })
+  useEffect(() => {
+    if (currentRow) {
+      form.reset({ name: currentRow.name })
+    } else {
+      form.reset()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentRow])
 
-  const onSubmit = (data: CompanyCreateForm) => {
-    console.log(data)
-    createCompany(data, {
-      onSuccess: () => {
+  const onSubmit = async (data: CompanyCreateForm | CompanyUpdateForm) => {
+    console.log('Submitting data:', data)
+    console.log('Is update:', isUpdate)
+    console.log('Current row:', currentRow)
+    try {
+      if (isUpdate && currentRow) {
+        // enviar SOLO los campos del formulario: supabase hará update parcial
+        await updateCompanyAsync({ id: currentRow.id, data })
         form.reset()
-      },
-    })
+        onOpenChange(false)
+        toast.success('Empresa actualizada')
+        return
+      }
+
+      await createCompanyAsync(data as CompanyCreateForm)
+      form.reset()
+      onOpenChange(false)
+      toast.success('Empresa creada')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error desconocido'
+      toast.error(message || 'Error al enviar el formulario')
+    }
   }
 
   return (
@@ -99,8 +130,38 @@ export function CompaniesActionDialog({
           </Form>
         </div>
         <DialogFooter>
-          <Button type='submit' form='user-form'>
-            Save changes
+          <Button
+            type='submit'
+            form='user-form'
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? (
+              <>
+                <svg
+                  className='mr-2 -ml-1 h-4 w-4 animate-spin'
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                >
+                  <circle
+                    className='opacity-25'
+                    cx='12'
+                    cy='12'
+                    r='10'
+                    stroke='currentColor'
+                    strokeWidth='4'
+                  ></circle>
+                  <path
+                    className='opacity-75'
+                    fill='currentColor'
+                    d='M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z'
+                  ></path>
+                </svg>
+                Guardando...
+              </>
+            ) : (
+              'Guardar cambios'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

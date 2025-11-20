@@ -1,8 +1,11 @@
 // src/app/providers/AuthProvider.tsx
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { repoAuth } from '@/features/auth/repo/repoAuth'
 import { useMyAuthStore } from '../stores/my-auth-store'
+
+// ⭐️ Variable global para controlar si ignorar eventos
+let ignoreAuthEvents = false
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const setAuth = useMyAuthStore((s) => s.setAuth)
@@ -10,6 +13,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const setIsLoading = useMyAuthStore((s) => s.setIsLoading)
   const isLoading = useMyAuthStore((s) => s.isLoading)
   const handleSessionChange = useMyAuthStore((s) => s.handleSessionChange)
+  const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
+
+  // ⭐️ Función para ignorar eventos temporalmente
+  const ignoreEventsTemporarily = (ms: number = 5000) => {
+    ignoreAuthEvents = true
+    setTimeout(() => {
+      ignoreAuthEvents = false
+    }, ms)
+  }
 
   useEffect(() => {
     const repo = repoAuth()
@@ -47,26 +59,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       event: string,
       session: Session | null
     ) => {
+      // ⭐️ IGNORAR TODOS LOS EVENTOS SI ESTÁ ACTIVO EL FLAG
+      if (ignoreAuthEvents) {
+        console.log(
+          `[AuthProvider] Ignoring ${event} due to temporary ignore flag`
+        )
+        return
+      }
+
+      console.log(`[AuthProvider] Auth state change: ${event}`, {
+        sessionUserId: session?.user?.id,
+        currentStoreUser: useMyAuthStore.getState().user?.auth_id,
+      })
+
       const newSession = normalize(session)
 
       // If there's no session (signed out / deleted) clear the store and exit.
-      // NOTE: when session === null we must NOT try the fast-path nor refetch.
       if (event === 'SIGNED_OUT' || event === 'USER_DELETED' || !newSession) {
         clearAuth()
         return
       }
 
-      // Delegate session-change handling to the store. The store knows the
-      // current user snapshot and can decide whether the incoming session
-      // belongs to the same identity (fast path: update tokens only). If the
-      // store returns true the session was applied and we can avoid a network
-      // revalidation; otherwise we call fetchAndSetAuth() to obtain the
-      // authoritative user+session from the backend.
+      // Delegate session-change handling to the store.
       try {
         const handled = handleSessionChange?.(newSession)
         if (handled) return
       } catch (e) {
-        // If store handler throws for any reason, fall back to revalidation
         console.error('[AuthProvider] handleSessionChange error', e)
       }
 
@@ -74,6 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     const sub = repo.onAuthStateChange(onAuthStateChange)
+    subscriptionRef.current = sub
 
     return () => {
       mounted = false
@@ -83,8 +102,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // noop
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [setAuth, clearAuth, setIsLoading, handleSessionChange])
+
   console.log('AuthProvider render, isLoading:', isLoading)
   if (isLoading) {
     return (
@@ -94,4 +113,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     )
   }
   return <>{children}</>
+}
+
+// ⭐️ Exportar función para que otros módulos puedan ignorar eventos
+export const temporarilyIgnoreAuthEvents = (ms: number = 5000) => {
+  ignoreAuthEvents = true
+  setTimeout(() => {
+    ignoreAuthEvents = false
+  }, ms)
 }

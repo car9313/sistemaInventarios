@@ -36,7 +36,7 @@ export type Profile = {
   full_name: string
   role: string
   auth_id: string
-  created_by?: number | null
+  created_by?: string | null
 }
 
 export type AuthUser = Profile & { email: string }

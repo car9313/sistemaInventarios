@@ -1,13 +1,5 @@
-import { z } from 'zod'
 import { useForm } from 'react-hook-form'
-import {
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@radix-ui/react-select'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Select } from 'react-day-picker'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -26,7 +18,9 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/password-input'
+import { PasswordInput } from '../../../components/password-input'
+import { SelectDropdown } from '../../../components/select-dropdown'
+import { roles } from '../data/data'
 import {
   type CreateUsuarioInput,
   createUsuarioSchema,
@@ -48,11 +42,13 @@ export function UsersActionDialog({
   const isEdit = !!currentRow
 
   const { mutate: createUsuario } = useCreateUsuario()
+
   const form = useForm<CreateUsuarioInput>({
     resolver: zodResolver(createUsuarioSchema),
-    defaultValues: {
+    defaultValues: currentRow ?? {
       email: '',
       full_name: '',
+      password: '',
       role: 'vendedor',
     },
   })
@@ -60,7 +56,6 @@ export function UsersActionDialog({
   const onSubmit = (data: CreateUsuarioInput) => {
     createUsuario(data, {
       onSuccess: () => {
-        onSuccess()
         form.reset()
       },
     })
@@ -123,6 +118,45 @@ export function UsersActionDialog({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                    <FormLabel className='col-span-2 text-end'>
+                      Password
+                    </FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        placeholder='e.g., S3cur3P@ssw0rd'
+                        className='col-span-4'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className='col-span-4 col-start-3' />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='role'
+                render={({ field }) => (
+                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                    <FormLabel className='col-span-2 text-end'>Role</FormLabel>
+                    <SelectDropdown
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      placeholder='Select a role'
+                      className='col-span-4'
+                      items={roles.map(({ label, value }) => ({
+                        label,
+                        value,
+                      }))}
+                    />
+                    <FormMessage className='col-span-4 col-start-3' />
+                  </FormItem>
+                )}
+              />
             </form>
           </Form>
         </div>
@@ -134,7 +168,4 @@ export function UsersActionDialog({
       </DialogContent>
     </Dialog>
   )
-}
-function onSuccess() {
-  throw new Error('Function not implemented.')
 }

@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { type Row } from '@tanstack/react-table'
 import { Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -12,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useContextCompanies } from '../context/companies-provider'
 import { companySchema } from '../data/schema'
+import { useCreateCompany } from '../hooks/use-companies'
 
 type DataTableRowActionsProps<TData> = {
   row: Row<TData>
@@ -23,6 +26,8 @@ export function DataTableRowActions<TData>({
   const company = companySchema.parse(row.original)
 
   const { setOpen, setCurrentRow } = useContextCompanies()
+  const { mutate: createCompany } = useCreateCompany()
+  const [isCopying, setIsCopying] = useState(false)
 
   return (
     <DropdownMenu modal={false}>
@@ -53,7 +58,29 @@ export function DataTableRowActions<TData>({
         >
           Edit
         </DropdownMenuItem>
-        <DropdownMenuItem disabled>Make a copy</DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            if (isCopying) return
+            setIsCopying(true)
+            createCompany(
+              { name: `${company.name} (copy)` },
+              {
+                onSuccess: () => {
+                  toast.success('Company copied')
+                  setIsCopying(false)
+                },
+                onError: (err: unknown) => {
+                  const msg = err instanceof Error ? err.message : String(err)
+                  toast.error(msg || 'Could not copy company')
+                  setIsCopying(false)
+                },
+              }
+            )
+          }}
+          disabled={isCopying}
+        >
+          {isCopying ? 'Copying...' : 'Make a copy'}
+        </DropdownMenuItem>
         <DropdownMenuItem disabled>Favorite</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSeparator />
